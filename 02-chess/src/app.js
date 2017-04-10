@@ -20,6 +20,11 @@ function onDragStart() {
         game.turn() === 'w' && player !== 'white' ||
         game.turn() === 'b' && player !== 'black'
     ) {
+        swal({
+            title: 'Error!',
+            text: `It's not your turn!`,
+            type: 'error'
+        });
         return false;
     }
 }
@@ -41,95 +46,97 @@ function onDrop(from, to) {
         move: move.san
     });
 
-    console.log(move)
+    highlightMove(move);
     updateBoard();
 
+}
+
+function highlightMove(move) {
+    $('.square-55d63').removeClass('highlight');
+    $(`.square-${move.from}`).addClass('highlight');
+    $(`.square-${move.to}`).addClass('highlight');
 }
 
 function updateBoard(data) {
     if(data) {
         const move = game.move(data.move);
         board.move( move.from + '-' + move.to );
-        // TODO: Highlight last move
+        highlightMove(move);
     }
 
     // History
-    const history = game.history( {verbose: true} );
+    const history = game.history( {verbose: true} ).reverse();
     $('div.history').html('');
     history.forEach((item) => {
-        $('div.history').append(`<div class="item">${item.piece}: ${item.from} -> ${item.to}</div>`);
+        const el = $(`<div class="item">${item.piece}: ${item.from} -> ${item.to}</div>`);
+        el.on('click', (e) => {
+            highlightMove(item);
+        });
+        $('div.history').append(el);
     });
 
     // TODO: Clock?
-    // TODO: History list
-    // TODO: Check for game over
     $('#turn').removeClass('b w');
     $('#turn').addClass(game.turn());
 
-    console.log(player, game.turn());
+    let msg;
+
+    // checkmate
+    if (game.in_checkmate() === true) {
+        msg = `Game over, ${game.turn()} lost!`;
+    }
+    // draw
+    else if (game.in_draw() === true) {
+        msg = `Draw!`;
+    }
+    // stalemate
+    else if(game.in_stalemate()) {
+        msg = `Game over, ${game.turn()} is in stalemate!`;
+    }
+
+    if(msg) {
+        swal({
+            title: `Game finished!`,
+            text: msg,
+            type: 'info'
+        });
+        return;
+    }
 
     if(player === 'white' && game.turn() == 'w' || player === 'black' && game.turn() == 'b') {
         swal({
             text: `It's your turn!`,
-            timer: 3000
+            type: 'info'
+        });
+    } else {
+        swal({
+            text: `It's your opponent's turn!`,
+            type: 'info'
         });
     }
 }
 
 function init() {
-    $('#hello-modal').modal({
-        onApprove: (data) => {
-            client.emit('new game');
-        },
-        onDeny: (data) => {
-            $('#join-game-modal').modal({
-                onApprove: (data) => {
-                    client.emit('join game', {
-                        game: $('#join-game-modal input').val()
-                    });
-                }
-            }).modal('show');
-        }
-    }).modal('show');
+    // Join game if ID is in URL
+    if (window.location.pathname.length > 1) {
+        client.emit( 'join game', {game: window.location.pathname.substr( 1 )} );
+    } else {
+        $('#hello-modal').modal({
+            onApprove: (data) => {
+                client.emit('new game');
+            },
+            onDeny: (data) => {
+                $('#join-game-modal').modal({
+                    onApprove: (data) => {
+                        client.emit('join game', {
+                            game: $('#join-game-modal input').val()
+                        });
+                    }
+                }).modal('show');
+            }
+        }).modal('show');
+    }
 }
-
-// TODO: Remove
-window.client = client;
-window.board = board;
-window.game = game;
-
-// *** Events *** //
-
-client.on( 'game created', (data) => {
-    console.log('game created', data)
-    window.history.pushState( data, data.game.id, '/' + data.game.id );
-});
-
-client.on('game started', (data) => {
-    disableLoader();
-    console.log('game started');
-    console.log(data);
-});
-
-client.on('game joined', (data) => {
-    enableLoader('Waiting for an opponent...');
-    console.log('game joined');
-    console.log(data);
-
-    game.load_pgn( data.game.pgn );
-    console.log(board);
-
-    board.position( data.game.fen, false );
-    board.orientation( data.player.color );
-    player = data.player.color;
-    swal(
-        'Game joined!',
-        `Your color is <b>${player}</b>!<br>Game ID: <b>${data.game.id}</b>`,
-        'success'
-    ).then(() => {
-        updateBoard();
-    });
-});
 
 function enableLoader(text) {
     $('.ui.dimmer').addClass('active');
@@ -142,16 +149,79 @@ function disableLoader() {
     $('.ui.dimmer').removeClass('active');
 }
 
+function undo() {
+    game.undo();
+    board.position( game.fen(), false );
+    updateBoard();
+}
+
+function restart() {
+    game.reset();
+    board.position( game.fen(), false );
+    updateBoard();
+}
+
+// TODO: Remove
+window.client = client;
+window.board = board;
+window.game = game;
+
+// *** Events *** //
+
+client.on( 'game created', (data) => {
+    window.history.pushState( data, data.game.id, '/' + data.game.id );
+});
+
+client.on('game started', (data) => {
+    disableLoader();
+});
+
+client.on('game joined', (data) => {
+    enableLoader('Loading...');
+
+    game.load_pgn( data.game.pgn );
+    board.position( data.game.fen, false );
+    board.orientation( data.player.color );
+    player = data.player.color;
+    swal(
+        'Game joined!',
+        `Your color is <b>${player}</b>!<br>Game ID: <b>${data.game.id}</b>`,
+        'success'
+    ).then(() => {
+        updateBoard();
+    });
+});
+
 client.on('move', (data) => {
-    console.log('move')
-    console.log(data)
     updateBoard(data)
 });
+
+client.on( 'undo', function() {
+    undo();
+});
+
+client.on( 'restart', function() {
+    restart();
+});
+
+/* BUTTONS, SIDEBAR */
 
 // Sidebar (History)
 $('div.history').sidebar({
     dimPage: false,
     transition: 'overlay'
 }).sidebar('attach events', '.button.history');
+
+// Undo
+$('.button.undo').on('click', (e) => {
+    undo();
+client.emit('undo');
+});
+
+// Restart
+$('.button.restart').on('click', (e) => {
+    restart();
+    client.emit('restart');
+});
 
 init();
