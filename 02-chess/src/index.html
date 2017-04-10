@@ -1,9 +1,82 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="styles/chessboard.css">
+    <link rel="stylesheet" type="text/css" href="styles/app.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.9/semantic.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/6.6.0/sweetalert2.min.css">
   </head>
-  <body>
-    <h1>04-chess</h4>
+  <body class="ui">
+    <div class="ui dimmer">
+      <div class="ui loader"></div>
+    </div>
+
+    <div class="ui sidebar inverted vertical menu history"></div>
+
+    <div class="pusher">
+      <div id="game">
+        <h1>04-chess</h1>
+          <div id="turn">
+            <div class="black">BLACK</div>
+            <div class="white">WHITE</div>
+          </div>
+          <div id="actions">
+            <button class="ui labeled icon button history">
+              <i class="history icon"></i>
+              History
+            </button>
+          </div>
+          <div id="board"></div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+
+    <div id="hello-modal" class="ui basic modal">
+      <div class="ui icon header">
+        <i class="idea icon"></i>
+        Hello World!
+      </div>
+      <div class="content">
+        <p>Do you want to create a new game, or join an existing game?</p>
+      </div>
+      <div class="actions">
+        <div class="ui basic cancel inverted button">
+          <i class="sign in icon"></i>
+          Join existing game
+        </div>
+        <div class="ui green ok inverted button">
+          <i class="plus icon"></i>
+          Create new game
+        </div>
+      </div>
+    </div>
+
+    <div id="join-game-modal" class="ui basic modal">
+      <div class="ui icon header">
+        <i class="sign in icon"></i>
+        Join Game
+      </div>
+      <div class="content">
+        <p>Please enter the game id:</p>
+        <div class="ui input">
+          <input type="text" placeholder="Game ID">
+        </div>
+      </div>
+      <div class="actions">
+        <div class="ui green ok inverted button">
+          <i class="checkmark icon"></i>
+          Join game
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.9/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.0/sweetalert2.min.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
 

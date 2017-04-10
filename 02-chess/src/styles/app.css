@@ -1,0 +1,22 @@
+body {
+    text-align: center;
+}
+
+#turn div {
+    display: none;
+}
+#turn.w > .white {
+    display: block;
+}
+#turn.b > .black {
+    display: block;
+}
+
+#game {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.modal, .modal .actions {
+    text-align: center !important;
+}
