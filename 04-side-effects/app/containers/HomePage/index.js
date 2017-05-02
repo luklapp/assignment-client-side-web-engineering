@@ -10,15 +10,39 @@
  */
 
 import React from 'react';
+import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
+import { Types, Creators } from './actions';
 
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  
+  constructor(props) {
+    super(props);
+    this.props.init();
+  }
+
   render() {
     return (
       <h1>
         <FormattedMessage {...messages.header} />
+        <button onClick={this.props.fetchDrivers}>FETCH DRIVERS</button>
       </h1>
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    init: () => {
+        dispatch(Creators.fetchConstructors());
+    },
+
+    fetchDrivers: () => {
+      console.log("ASDASD");
+      dispatch(Creators.fetchDrivers());
+    }
+  };
+}
+
+export default connect(undefined, mapDispatchToProps)(HomePage);
