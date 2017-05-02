@@ -10,6 +10,9 @@ const initialState = fromJS({
 
 const fetchConstructorsSuccess = (state = initialState, action) => {
   console.log("FETCH CONSTRUCTORS SUCCESS");
+
+  const constructors = action.response.map((obj) => obj.constructorId);
+
   return state.set('constructors', action.response);
 }
 
@@ -19,9 +22,7 @@ const fetchConstructorsError = (state = initialState, action) => {
 
 const fetchDriversSuccess = (state = initialState, action) => {
   console.log("FETCH DRIVERS SUCCESS");
-  console.log(action);
-  return state;
-  //return state.set('user', action.response.data.user);
+  return state.set('drivers', action.response.MRData.DriverTable.Drivers);
 }
 
 const fetchDriversError = (state = initialState, action) => {

@@ -1,7 +1,7 @@
 import { createActions } from 'reduxsauce';
 
 const { Types, Creators } = createActions({
-  fetchDrivers:             null,
+  fetchDrivers:             ['constructorId'],
   fetchDriversSuccess:      ['response'],
   fetchDriversError:        ['error'],
 

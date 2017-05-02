@@ -26,7 +26,6 @@ export function* fetchConstructors(action) {
           constructors = constructors.concat(data.MRData.ConstructorTable.Constructors);
         });
       });
-      console.log(constructors);
     });
 
     yield put(Creators.fetchConstructorsSuccess(constructors));
@@ -38,7 +37,7 @@ export function* fetchConstructors(action) {
 
 export function* fetchDrivers(action) {
   try {
-    const url = `http://ergast.com/api/f1/drivers.json`
+    const url = `http://ergast.com/api/f1/constructors/${action.constructorId}/drivers.json?limit=1000`
     const response = yield call(request, url);
     yield put(Creators.fetchDriversSuccess(response));
   } catch (err) {

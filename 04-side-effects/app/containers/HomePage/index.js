@@ -14,6 +14,9 @@ import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { Types, Creators } from './actions';
+import { createStructuredSelector } from 'reselect';
+
+const Typeahead = require('react-typeahead').Typeahead;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   
@@ -23,26 +26,40 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
+
     return (
       <h1>
         <FormattedMessage {...messages.header} />
-        <button onClick={this.props.fetchDrivers}>FETCH DRIVERS</button>
+        <Typeahead
+            options={this.props.constructors}
+            onOptionSelected={this.props.onOptionSelected}
+            displayOption={this.props.displayOption}
+            filterOption='constructorId'
+            maxVisible={5}
+        />
       </h1>
     );
   }
 }
+
+const mapStateToProps = createStructuredSelector({
+  constructors: (state) => {
+    return state.getIn(['home', 'constructors']);
+  }
+});
 
 function mapDispatchToProps(dispatch) {
   return {
     init: () => {
         dispatch(Creators.fetchConstructors());
     },
-
-    fetchDrivers: () => {
-      console.log("ASDASD");
-      dispatch(Creators.fetchDrivers());
+    onOptionSelected: (selection) => {
+        dispatch(Creators.fetchDrivers(selection.constructorId))
+    },
+    displayOption: (option) => {
+        return option.name;
     }
   };
 }
 
-export default connect(undefined, mapDispatchToProps)(HomePage);
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
