@@ -4,7 +4,7 @@
     "build": "webpack --progress --colors -p",
     "lint": "eslint -c ./.eslintrc.js ./src",
     "lint:fix": "eslint --fix -c ./.eslintrc.js ./src",
-    "start": "webpack-dev-server --progress --colors --port 5000"
+    "start": "webpack-dev-server --progress --colors"
   },
   "dependencies": {
     "pouchdb": "^6.2.0",
