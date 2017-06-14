@@ -20,6 +20,6 @@ Die Unterschiede sind relativ klein, da die Assets bereits minifiziert sind. Den
 
 ### Screenshots
 
-![Ohne Caching][screenshots/no_caching.png]
-![Mit Caching][screenshots/caching.png]
-![Serviceworker][screenshots/serviceworker.png]
+![Ohne Caching](screenshots/no_caching.png)
+![Mit Caching](screenshots/caching.png)
+![Serviceworker](screenshots/serviceworker.png)
